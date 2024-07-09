@@ -74,7 +74,7 @@ public abstract class BaseDao
 		return this.getSqlSession().selectList(getStatementName(statementName), param);
 	}
 	
-	public int getCount(String statementName, Object param)
+	public int queryCount(String statementName, Object param)
 	{
 		return this.getSqlSession().selectOne(getStatementName(statementName), param);
 	}
