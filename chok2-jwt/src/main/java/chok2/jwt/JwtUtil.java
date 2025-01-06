@@ -4,8 +4,8 @@ import java.util.Date;
 import java.util.Map;
 
 import javax.crypto.spec.SecretKeySpec;
-import javax.xml.bind.DatatypeConverter;
 
+import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
@@ -106,7 +106,7 @@ public class JwtUtil
 			Date now = new Date(nowMillis);
 
 			// 生成签名密钥
-			byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary(jwtConfig.getBase64Secret());
+			byte[] apiKeySecretBytes = Base64.decodeBase64(jwtConfig.getBase64Secret());
 			SecretKeySpec signingKey = new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
 
 			// 添加构成JWT的参数
@@ -167,7 +167,7 @@ public class JwtUtil
 	{
 		try
 		{
-			Claims claims = Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary(base64Secret))
+			Claims claims = Jwts.parser().setSigningKey(Base64.decodeBase64(base64Secret))
 					.parseClaimsJws(authToken).getBody();
 			return claims;
 		}

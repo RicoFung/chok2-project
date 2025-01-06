@@ -4,6 +4,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import javax.crypto.Cipher;
@@ -65,8 +66,7 @@ public class EncryptionUtil
 			{
 				System.out.println("EncryptUtil ignore java.util.Base64 Class");
 			}
-			return (new sun.misc.BASE64Encoder()).encode(str.getBytes("UTF-8")).replaceAll("\r", "").replaceAll("\n",
-					"");
+			return Base64.getEncoder().encodeToString(str.getBytes("UTF-8"));
 		}
 		catch (Exception e)
 		{
@@ -97,7 +97,7 @@ public class EncryptionUtil
 				{
 					System.out.println("EncryptUtil ignore java.util.Base64 Class");
 				}
-				return new String((new sun.misc.BASE64Decoder()).decodeBuffer(str), "UTF-8");
+				return new String(Base64.getDecoder().decode(str), "UTF-8");
 			}
 		}
 		catch (Exception e)
