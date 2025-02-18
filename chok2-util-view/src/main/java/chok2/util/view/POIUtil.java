@@ -87,6 +87,23 @@ public class POIUtil
 	}
 
 	/**
+	 * 读取 EXCEL
+	 * @param file
+	 * @param sheetSize 读取多少个sheet的数据。为null时，读取所有sheet
+	 * @return
+	 * @throws IOException
+	 */
+	public static List<List<String[]>> readExcelFile(MultipartFile file, Integer sheetSize) throws IOException
+	{
+		// 检查文件
+		checkFile(file);
+		// 获得Workbook工作薄对象
+		Workbook workbook = getWorkBook(file);
+		// 读取到List<String[]>
+		return workbookToLists(workbook, sheetSize);
+	}
+
+	/**
 	 * 
 	 * @param workbook
 	 * @return List<String[]>
@@ -154,6 +171,60 @@ public class POIUtil
 			workbook.close();
 		}
 		return list;
+	}
+
+	private static List<List<String[]>> workbookToLists(Workbook workbook, Integer sheetSize) throws IOException
+	{
+		List<List<String[]>> lists = new ArrayList<List<String[]>>();
+		if (workbook != null)
+		{
+			if (sheetSize == null)
+			{
+				sheetSize = workbook.getNumberOfSheets();
+			}
+			for (int sheetNum = 0; sheetNum < sheetSize; sheetNum++)
+			{
+				// 每个 sheet 返回一个 List<String[]
+				List<String[]> list = new ArrayList<String[]>();
+				// 获得当前sheet工作表
+				Sheet sheet = workbook.getSheetAt(sheetNum);
+				if (sheet == null)
+				{
+					continue;
+				}
+				// 获得当前sheet的开始行
+				int firstRowNum = sheet.getFirstRowNum();
+				// 获得当前sheet的结束行
+				int lastRowNum = sheet.getLastRowNum();
+				// 循环除了第一行的所有行
+				for (int rowNum = firstRowNum + 1; rowNum <= lastRowNum; rowNum++)
+				{
+					// 获得当前行
+					Row row = sheet.getRow(rowNum);
+					if (row == null)
+					{
+						continue;
+					}
+					// 获得当前行的开始列
+					int firstCellNum = row.getFirstCellNum();
+					// 获得当前行的列数
+					int lastCellNum = row.getLastCellNum();
+					String[] cells = new String[row.getLastCellNum()];
+					// int lastCellNum = row.getPhysicalNumberOfCells();
+					// String[] cells = new String[row.getPhysicalNumberOfCells()];
+					// 循环当前行
+					for (int cellNum = firstCellNum; cellNum < lastCellNum; cellNum++)
+					{
+						Cell cell = row.getCell(cellNum);
+						cells[cellNum] = getCellValue(cell);
+					}
+					list.add(cells);
+				}
+				lists.add(list);
+			}
+			workbook.close();
+		}
+		return lists;
 	}
 
 	/**
