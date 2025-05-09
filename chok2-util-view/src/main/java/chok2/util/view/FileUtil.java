@@ -13,10 +13,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 /**
  * 文件对象操作类
@@ -540,21 +537,15 @@ public class FileUtil
 	 * @return java.io.File
 	 * @throws IOException
 	 */
-	public static File multipartFileToFile (MultipartFile multipartFile) throws IOException
+	public static File multipartFileToFile(MultipartFile multipartFile) throws IOException
 	{
-		CommonsMultipartFile commonsMultipartFile = (CommonsMultipartFile) multipartFile;
-		FileItem fileItem = commonsMultipartFile.getFileItem();
-		DiskFileItem diskFileItem = (DiskFileItem) fileItem;
-		String absPath = diskFileItem.getStoreLocation().getAbsolutePath();
-		File file = new File(absPath);
+		// 获取临时目录
+		String tempDir = System.getProperty("java.io.tmpdir");
+		// 创建目标文件（以原文件名命名）
+		File file = new File(tempDir + File.separator + multipartFile.getOriginalFilename());
 
-		// trick to implicitly save on disk small files (<10240 bytes by
-		// default)
-
-		if (!file.exists()) {
-			file.createNewFile();
-			multipartFile.transferTo(file);
-		}
+		// 将 MultipartFile 的内容写入到目标文件中
+		multipartFile.transferTo(file);
 
 		return file;
 	}
